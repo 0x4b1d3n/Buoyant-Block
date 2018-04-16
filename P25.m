@@ -18,11 +18,11 @@ end
 %% parmeters
 p.g     = 10;
 p.rho_w = 1;
-p.rho_b = 0.25*p.rho_w;
+p.rho_b = 0.4*p.rho_w;
 
 p.l = 1;
 p.w = 1; 
-p.h = 0.5;
+p.h = 0.8;
 
 p.m = p.l*p.w*p.h*p.rho_b;
 
@@ -47,16 +47,16 @@ r_C0relW_B = [0; 0; -p.hw/2];
 r_GrelW_B  = [0; 0;  p.h/2-p.hw];
 F_grav_B   = p.m*p.g*[0; sin(theta); -cos(theta)];
 F_bouy_B   = sub_vol*p.rho_w*p.g*[0; -sin(theta); cos(theta)];
-Msum_W     = M_W_B + cross(r_C0relW_B, F_bouy_B) + cross(r_GrelW_B, F_grav_B)
+Msum_W     = M_W_B + cross(r_C0relW_B, F_bouy_B) + cross(r_GrelW_B, F_grav_B);
 
 %% initial conditions
-boat_G_F_0  = [0; 0; p.h/2 - p.hw];
+boat_G_F_0  = [0; 0; p.h/2 - 0.85*p.hw];
 
-v_G_F_0     = [0; 0; 0]; 
+v_G_F_0     = [0; 0; 0];
 
-R_0 = angle2dcm(deg2rad(0), deg2rad(0.0005), theta);
+R_0 = angle2dcm(deg2rad(0), deg2rad(20), deg2rad(4));
 
-w_B_0 = [0; 0; 0];  w_F_0 = R_0 * w_B_0;
+w_B_0 = [0; 0.2; 0];  w_F_0 = R_0 * w_B_0;
 
 z_F_0 = [boat_G_F_0; v_G_F_0; w_F_0; reshape(R_0, 9,1)];
 
@@ -128,7 +128,7 @@ R_sol   = sol(:, 10:18);
 filename = 'Buoyant Block';
 v = VideoWriter(filename);
 open(v);
-time_frac = 1;
+time_frac = 0.4;
 tic
 start = toc;
 i = 0;
@@ -195,7 +195,7 @@ function zdot = RHS_cent(t, z_t, p)
     a_G_F       = Fsum_F/p.m;
     
     % AMB
-    Msum_G_F    = cross(sub_C_F, F_bouy_F) + cross(r_G_F, F_grav_F)
+    Msum_G_F    = cross(sub_C_F, F_bouy_F) + cross(r_G_F, F_grav_F);
     I           = R*p.I_B*R';
     w_dot       = I \ ( Msum_G_F - cross(w_F, I*w_F) );
     R_dot       = skew(w_F)*R;
